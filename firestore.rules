@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// Archy security rules.
+// Roles are stored on the user doc (architect | diaspora | developer).
+// Projects are owned by an architect and optionally assigned to a diaspora client.
+// Properties are owned by a developer. Chat/sessions are limited to signed-in users.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Users can read any profile (needed to look up a client by email), but only
+    // create/update their own document.
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == userId;
+    }
+
+    // Projects: architect (owner) has full control; the assigned diaspora client
+    // can read and update (milestone approve/reject happens via a project update).
+    match /projects/{projectId} {
+      function isArchitect() {
+        return signedIn() && resource.data.architectId == request.auth.uid;
+      }
+      function isDiaspora() {
+        return signedIn() && resource.data.diasporaId == request.auth.uid;
+      }
+      allow read: if isArchitect() || isDiaspora();
+      allow create: if signedIn() && request.resource.data.architectId == request.auth.uid;
+      allow update: if isArchitect() || isDiaspora();
+      allow delete: if isArchitect();
+
+      // Payments recorded against a project milestone.
+      match /payments/{paymentId} {
+        allow read: if signedIn();
+        allow create: if signedIn();
+      }
+    }
+
+    // Properties: any signed-in user can browse; only the owning developer writes.
+    match /properties/{propertyId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.developerId == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.developerId == request.auth.uid;
+    }
+
+    // Leads/inquiries (e.g. "Reserve Unit").
+    match /leads/{leadId} {
+      allow read, create: if signedIn();
+    }
+
+    // Project chat threads.
+    match /chats/{projectId}/messages/{messageId} {
+      allow read, create: if signedIn();
+    }
+  }
+}

@@ -1,0 +1,5 @@
+// Unity common configuration
+// Defines streaming assets extensions to exclude from compression
+if (!project.hasProperty('unityStreamingAssets')) {
+    ext.unityStreamingAssets = ""
+}

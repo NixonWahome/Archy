@@ -1,0 +1,2 @@
+// Unity symbol keeping configuration
+// This file is intentionally minimal — symbols are managed per-build via debugSymbolLevel in unityLibrary/build.gradle

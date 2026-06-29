@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unity-like AR Test - Backend GLB</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style> body { margin: 0; } model-viewer { width: 100vw; height: 100vh; }</style>
+</head>
+<body>
+    <model-viewer 
+        src="models/demo.glb" 
+        ar 
+        ar-modes="webxr scene-viewer quick-look" 
+        camera-controls 
+        auto-rotate 
+        shadow-intensity="1" 
+        exposure="0.8" 
+        loading="lazy" 
+        alt="AR Model from Backend">
+        <button slot="ar-button">AR View</button>
+    </model-viewer>
+</body>
+</html>
+<!-- Open on phone: http://YOUR-IP:5000/unity_ar_demo.html (after process model as 'demo') 
+Web AR simulates Unity AR - phone camera + place model. Full Unity next. -->
